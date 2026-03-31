@@ -18,16 +18,12 @@ jobs:
           node-version: 20
       - name: Install and Build
         run: |
-          # Denna rad hittar var package.json finns och går dit automatiskt
-          cd $(find . -name package.json -not -path "*/node_modules/*" -exec dirname {} \;)
+          cd Pelle/frontend
           npm install --legacy-peer-deps
           npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Denna rad hittar var den färdiga "build"-mappen skapades
-          path: |
-            **/build
-            **/dist
+          path: ./Pelle/frontend/build
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
