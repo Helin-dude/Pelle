@@ -1,0 +1,109 @@
+{
+  "project_name": "CCTV Monitor Dashboard",
+  "theme_and_archetype": {
+    "theme": "Dark",
+    "archetype": "2 (Performance Pro)",
+    "description": "High visibility 'Tactical Minimalism' optimized for a modern CCTV monitoring app. Deep obsidian background with electric blaze red (for LIVE alerts) and crisp white/zinc contrast. Mobile-first, tactile, technical feel."
+  },
+  "typography": {
+    "primary_font": "Outfit",
+    "secondary_font": "JetBrains Mono",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl font-black tracking-tighter text-white",
+      "h2": "text-2xl sm:text-3xl font-bold tracking-tight text-white",
+      "h3": "text-xl sm:text-2xl font-semibold text-zinc-100",
+      "body": "text-base font-medium text-zinc-400 font-sans",
+      "data_readout": "text-sm font-mono tracking-widest uppercase text-zinc-300",
+      "micro": "text-[10px] font-mono tracking-[0.2em] uppercase text-zinc-500"
+    }
+  },
+  "colors": {
+    "background": "bg-zinc-950",
+    "surface": "bg-zinc-900",
+    "surface_elevated": "bg-zinc-800",
+    "text_primary": "text-white",
+    "text_secondary": "text-zinc-400",
+    "border": "border-zinc-800/80",
+    "accent_live": "text-red-500 bg-red-500/10 border-red-500/20",
+    "accent_active": "text-zinc-100 bg-zinc-800 border-zinc-700",
+    "status_connected": "text-emerald-400"
+  },
+  "layout_and_spacing": {
+    "app_wrapper": "min-h-screen bg-black flex justify-center text-zinc-100",
+    "app_container": "w-full max-w-md min-h-screen bg-zinc-950 flex flex-col relative border-x border-zinc-900 shadow-2xl",
+    "section_padding": "p-6",
+    "gap_system": "gap-4 sm:gap-6",
+    "grid_system": "grid grid-cols-2 gap-4",
+    "border_radius": "rounded-3xl"
+  },
+  "components": {
+    "camera_toggle": {
+      "description": "Tactile pill-shaped toggle at the top of the dashboard. Uses Framer Motion for the active background sliding.",
+      "container_classes": "bg-zinc-900/80 backdrop-blur-md border border-zinc-800/80 p-1.5 rounded-full flex gap-1 mx-6 mt-6 shadow-sm",
+      "active_btn_classes": "relative z-10 px-6 py-3 text-sm font-semibold text-white flex-1 transition-all rounded-full flex items-center justify-center gap-2",
+      "active_bg_indicator": "absolute inset-0 bg-zinc-700/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] rounded-full z-0",
+      "inactive_btn_classes": "relative z-10 px-6 py-3 text-sm font-medium text-zinc-500 flex-1 hover:text-zinc-300 transition-all text-center flex items-center justify-center gap-2"
+    },
+    "video_stream_container": {
+      "description": "Main CCTV feed placeholder. Needs to look like a high-tech camera viewfinder.",
+      "container_classes": "relative aspect-[4/3] w-[calc(100%-3rem)] mx-6 mt-6 bg-black rounded-[2rem] overflow-hidden border border-zinc-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)]",
+      "image_classes": "w-full h-full object-cover opacity-80 filter contrast-125 saturate-50",
+      "live_overlay": "absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-red-500/30 text-red-500 px-3 py-1.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.2)]",
+      "battery_overlay": "absolute top-4 right-4 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-white px-3 py-1.5 rounded-full text-xs font-mono flex items-center gap-2",
+      "technical_corners": "Absolute positioned brackets (L-shapes) in the 4 corners using thin borders to mimic camera UI"
+    },
+    "status_bento": {
+      "description": "Bento-style grids for Uptime and Connection Strength. Strict, dense 'Control Room' mode.",
+      "wrapper_classes": "grid grid-cols-2 gap-4 px-6 mt-6",
+      "card_classes": "bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3 relative overflow-hidden",
+      "label": "text-[10px] font-mono tracking-widest text-zinc-500 uppercase",
+      "value": "text-xl font-mono text-zinc-100 flex items-center gap-2"
+    },
+    "alerts_section": {
+      "description": "List or stacked cards for Motion and Sound alerts.",
+      "wrapper_classes": "flex flex-col gap-3 px-6 mt-6",
+      "card_classes": "bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-4 flex items-center justify-between",
+      "icon_wrapper_active": "bg-red-500/10 text-red-500 p-2 rounded-xl",
+      "icon_wrapper_inactive": "bg-zinc-800/50 text-zinc-500 p-2 rounded-xl"
+    },
+    "settings_panel": {
+      "description": "Sliders for Brightness and Contrast.",
+      "wrapper_classes": "bg-zinc-900 border border-zinc-800/60 rounded-[2rem] p-6 mx-6 mt-6 mb-8 flex flex-col gap-6",
+      "slider_track": "bg-zinc-800 h-2 rounded-full overflow-hidden",
+      "slider_fill": "bg-zinc-400 h-full",
+      "slider_thumb": "w-5 h-5 bg-white rounded-full shadow-md border-2 border-zinc-900"
+    },
+    "google_login_screen": {
+      "description": "Minimalist landing page for login. Command-center vibe.",
+      "wrapper_classes": "flex flex-col items-center justify-center h-full px-8 text-center",
+      "logo_classes": "w-20 h-20 bg-zinc-900 rounded-[2rem] border border-zinc-800 mb-8 flex items-center justify-center text-white shadow-2xl shadow-zinc-900/50",
+      "button_classes": "w-full bg-white text-zinc-950 font-bold rounded-2xl px-6 py-4 flex items-center justify-center gap-3 hover:bg-zinc-200 transition-transform active:scale-95 shadow-xl shadow-white/5 mt-12"
+    }
+  },
+  "animations": {
+    "live_indicator": "Use 'animate-pulse' on a small red circle next to the 'LIVE' text.",
+    "page_transition": "Framer Motion opacity and Y-axis translation (from y: 20, opacity: 0 to y: 0, opacity: 1).",
+    "toggle_slide": "Framer Motion layoutId='active-tab' for the sliding background behind the active camera pill."
+  },
+  "icons_library": "phosphor-react or lucide-react (Phosphor preferred for the technical/dense look. Suggest installing @phosphor-icons/react)",
+  "media": {
+    "pelle_camera_placeholder": {
+      "url": "https://images.unsplash.com/photo-1505656029707-0fd14cabd9ec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxjdXRlJTIwZG9nJTIwc2xlZXBpbmclMjBiZWR8ZW58MHx8fHwxNzc0OTc4NDkyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Sleeping dog representing the Pelle camera stream"
+    },
+    "printer_camera_placeholder": {
+      "url": "https://images.unsplash.com/photo-1642969164999-979483e21601?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzV8MHwxfHNlYXJjaHwxfHwzRCUyMHByaW50ZXIlMjBwcmludGluZ3xlbnwwfHx8fDE3NzQ5Nzg0OTJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "3D printer printing representing the Printer camera stream"
+    }
+  },
+  "specific_instructions_to_main_agent": [
+    "Install @phosphor-icons/react if using it, otherwise use lucide-react for the icons like Camera, Battery, WifiHigh, Timer, Activity, Sliders.",
+    "CRITICAL: All interactive elements (buttons, inputs, toggles, sliders) MUST include a 'data-testid' attribute (e.g., data-testid='login-btn', data-testid='camera-toggle-pelle', data-testid='motion-alert-toggle').",
+    "The application should feel like a native mobile app. Maintain a maximum width container (max-w-md) centered on the screen when viewed on desktop.",
+    "Use JetBrains Mono for all numeric stats, times, battery percentages, and technical labels.",
+    "Implement routing (or simple conditional state) to show the Google Login screen first, and upon clicking, navigate to the Dashboard.",
+    "For the camera settings (brightness/contrast), use standard input ranges or a custom Shadcn slider. Ensure they look tactile and fit the dark theme.",
+    "Do not use generic 'Inter' for headings. Use the designated typography classes.",
+    "The video stream container should have absolute-positioned UI overlays on top of the image (LIVE indicator, Battery percentage)."
+  ]
+}
