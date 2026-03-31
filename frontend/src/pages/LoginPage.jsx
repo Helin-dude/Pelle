@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 
-// Custom Pelle Logo - Green P with camera lens in the hole
+// Custom Pelle Logo - Green P with camera lens in the hole (light theme)
 const PelleLogo = ({ className }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Green P letter */}
@@ -12,17 +13,17 @@ const PelleLogo = ({ className }) => (
     {/* Inner cutout for P hole */}
     <path
       d="M45 30h10c8.284 0 15 6.716 15 15s-6.716 15-15 15H45V30z"
-      fill="#09090b"
+      fill="#ffffff"
     />
     {/* Camera lens outer ring */}
-    <circle cx="55" cy="45" r="12" fill="#18181b" stroke="#3f3f46" strokeWidth="2"/>
+    <circle cx="55" cy="45" r="12" fill="#f0fdf4" stroke="#86efac" strokeWidth="2"/>
     {/* Camera lens inner rings */}
-    <circle cx="55" cy="45" r="8" fill="#27272a"/>
-    <circle cx="55" cy="45" r="5" fill="#09090b"/>
+    <circle cx="55" cy="45" r="8" fill="#dcfce7"/>
+    <circle cx="55" cy="45" r="5" fill="#bbf7d0"/>
     {/* Lens reflection/highlight */}
-    <circle cx="52" cy="42" r="2" fill="#4ade80" opacity="0.6"/>
+    <circle cx="52" cy="42" r="2" fill="#22c55e" opacity="0.8"/>
     {/* Outer lens ring detail */}
-    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1" opacity="0.5"/>
+    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5" opacity="0.6"/>
   </svg>
 );
 
@@ -43,22 +44,22 @@ const LoginPage = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex justify-center">
-      <div className="w-full max-w-md min-h-screen bg-zinc-950 flex flex-col relative border-x border-zinc-900 shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-white/80 backdrop-blur-sm flex flex-col relative border-x border-green-100 shadow-xl">
         <div className="flex flex-col items-center justify-center flex-1 px-8 text-center">
           {/* Pelle Logo - Green P with camera lens */}
           <div 
             data-testid="app-logo"
-            className="w-24 h-24 bg-zinc-900 rounded-[2rem] border border-zinc-800 mb-8 flex items-center justify-center shadow-2xl shadow-emerald-900/20"
+            className="w-28 h-28 bg-white rounded-[2rem] border-2 border-green-200 mb-8 flex items-center justify-center shadow-lg shadow-green-200/50"
           >
-            <PelleLogo className="w-16 h-16" />
+            <PelleLogo className="w-20 h-20" />
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl font-black tracking-tighter text-white mb-2 font-sans">
+          <h1 className="text-5xl font-black tracking-tighter text-gray-900 mb-2 font-sans">
             Pelle
           </h1>
-          <p className="text-zinc-500 font-mono text-xs tracking-widest uppercase mb-12">
+          <p className="text-green-600 font-mono text-xs tracking-widest uppercase mb-12">
             Kameraövervakning
           </p>
 
@@ -66,7 +67,7 @@ const LoginPage = ({ user }) => {
           <button
             data-testid="google-login-btn"
             onClick={handleGoogleLogin}
-            className="w-full bg-white text-zinc-950 font-bold rounded-2xl px-6 py-4 flex items-center justify-center gap-3 hover:bg-zinc-200 transition-all active:scale-95 shadow-xl shadow-white/5"
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold rounded-2xl px-6 py-4 flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg shadow-green-500/30"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -90,18 +91,21 @@ const LoginPage = ({ user }) => {
           </button>
 
           {/* Security Note */}
-          <div className="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl max-w-xs">
-            <p className="text-zinc-500 text-[10px] font-mono tracking-wider uppercase mb-1">
-              🔒 Lokal Nätverkssäkerhet
-            </p>
-            <p className="text-zinc-600 text-xs">
-              Kameraströmmar är endast tillgängliga inom ditt hemma-WiFi nätverk
+          <div className="mt-10 p-4 bg-green-50 border border-green-200 rounded-2xl max-w-xs">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <ShieldCheck className="w-4 h-4 text-green-600" />
+              <p className="text-green-700 text-xs font-semibold uppercase tracking-wide">
+                Lokal Nätverkssäkerhet
+              </p>
+            </div>
+            <p className="text-green-600/80 text-xs">
+              Kameraströmmar är endast tillgängliga inom ditt hemma-WiFi
             </p>
           </div>
 
           {/* Footer */}
-          <p className="text-zinc-700 text-[10px] font-mono tracking-widest uppercase mt-8">
-            Secure • Private • Local Network Only
+          <p className="text-green-400 text-[10px] font-mono tracking-widest uppercase mt-10">
+            Säker • Privat • Lokalt Nätverk
           </p>
         </div>
       </div>

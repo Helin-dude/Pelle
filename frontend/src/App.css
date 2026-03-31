@@ -1,7 +1,7 @@
 /* Main app container */
 .App {
     min-height: 100vh;
-    background-color: #000;
+    background-color: #f0fdf4;
 }
 
 /* Animation for page transitions */
@@ -20,40 +20,40 @@
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Slider track styling for dark theme */
+/* Slider track styling for light theme */
 [data-radix-slider-track] {
-    background-color: #27272a !important;
+    background-color: #dcfce7 !important;
     height: 8px !important;
     border-radius: 9999px !important;
 }
 
 [data-radix-slider-range] {
-    background-color: #71717a !important;
+    background-color: #22c55e !important;
 }
 
 [data-radix-slider-thumb] {
     width: 20px !important;
     height: 20px !important;
-    background-color: #fafafa !important;
-    border: 2px solid #18181b !important;
+    background-color: #ffffff !important;
+    border: 2px solid #22c55e !important;
     border-radius: 9999px !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 [data-radix-slider-thumb]:hover {
-    background-color: #e4e4e7 !important;
+    background-color: #f0fdf4 !important;
 }
 
 [data-radix-slider-thumb]:focus {
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(113, 113, 122, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3) !important;
 }
 
-/* Switch styling for dark theme */
+/* Switch styling for light theme */
 [data-state="checked"][role="switch"] {
-    background-color: #ef4444 !important;
+    background-color: #22c55e !important;
 }
 
 [data-state="unchecked"][role="switch"] {
-    background-color: #3f3f46 !important;
+    background-color: #d1d5db !important;
 }
