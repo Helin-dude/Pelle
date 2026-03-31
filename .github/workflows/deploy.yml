@@ -15,13 +15,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20      
-          - name: Install and Build
+          node-version: 20
+      - name: Install and Build
         run: |
           cd frontend
           npm install --legacy-peer-deps
           npm run build
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
