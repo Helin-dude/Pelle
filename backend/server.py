@@ -68,10 +68,12 @@ class AlertSettings(BaseModel):
     user_id: str
     motion_enabled: bool = True
     sound_enabled: bool = True
+    sound_sensitivity: int = 50
 
 class AlertSettingsUpdate(BaseModel):
     motion_enabled: Optional[bool] = None
     sound_enabled: Optional[bool] = None
+    sound_sensitivity: Optional[int] = None
 
 # ============ AUTH HELPERS ============
 
@@ -297,7 +299,8 @@ async def get_alert_settings(request: Request):
         default_settings = {
             "user_id": user.user_id,
             "motion_enabled": True,
-            "sound_enabled": True
+            "sound_enabled": True,
+            "sound_sensitivity": 50
         }
         await db.alert_settings.insert_one(default_settings)
         

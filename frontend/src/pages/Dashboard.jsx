@@ -10,7 +10,12 @@ import {
   Contrast,
   LogOut,
   Settings,
-  ShieldCheck
+  ShieldCheck,
+  Link,
+  Check,
+  Maximize2,
+  Minimize2,
+  X
 } from "lucide-react";
 import { Slider } from "../components/ui/slider";
 import { Switch } from "../components/ui/switch";
@@ -70,8 +75,17 @@ const Dashboard = ({ user: propUser, logout }) => {
   // Alert settings
   const [alertSettings, setAlertSettings] = useState({
     motion_enabled: true,
-    sound_enabled: true
+    sound_enabled: true,
+    sound_sensitivity: 50
   });
+  
+  // Stream URL input state
+  const [streamUrlInput, setStreamUrlInput] = useState("");
+  const [showStreamInput, setShowStreamInput] = useState(false);
+  const [streamSaved, setStreamSaved] = useState(false);
+  
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Fetch camera settings
   const fetchCameraSettings = useCallback(async (cameraId) => {
@@ -147,6 +161,12 @@ const Dashboard = ({ user: propUser, logout }) => {
     fetchCameraSettings('printer');
     fetchAlertSettings();
   }, [fetchCameraSettings, fetchAlertSettings]);
+
+  // Reset stream URL input when camera changes
+  useEffect(() => {
+    setStreamUrlInput(cameraSettings[activeCamera]?.stream_url || "");
+    setStreamSaved(false);
+  }, [activeCamera, cameraSettings]);
 
   // Uptime counter
   useEffect(() => {
@@ -262,7 +282,81 @@ const Dashboard = ({ user: propUser, logout }) => {
           <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-zinc-300 px-3 py-1.5 rounded-full text-[10px] font-mono tracking-widest uppercase">
             {currentCamera.name}
           </div>
+
+          {/* Fullscreen Button */}
+          <button
+            data-testid="fullscreen-btn"
+            onClick={() => setIsFullscreen(true)}
+            className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-zinc-300 hover:text-white p-2 rounded-full transition-colors"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
         </div>
+
+        {/* Fullscreen Modal */}
+        {isFullscreen && (
+          <div 
+            data-testid="fullscreen-modal"
+            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+          >
+            {/* Fullscreen Video */}
+            <div 
+              className="relative w-full h-full"
+              style={{
+                filter: `brightness(${currentSettings.brightness / 50}) contrast(${currentSettings.contrast / 50})`
+              }}
+            >
+              <img
+                src={currentSettings.stream_url || currentCamera.placeholder}
+                alt={`${currentCamera.name} camera feed`}
+                className="w-full h-full object-contain"
+              />
+
+              {/* Fullscreen Overlays */}
+              <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md border border-red-500/30 text-red-500 px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-2">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-live-pulse" />
+                LIVE
+              </div>
+
+              <div className="absolute top-6 right-6 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-white px-4 py-2 rounded-full text-sm font-mono flex items-center gap-2">
+                <Battery className="w-5 h-5" />
+                {currentCamera.battery}%
+              </div>
+
+              <div className="absolute bottom-6 left-6 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-zinc-300 px-4 py-2 rounded-full text-xs font-mono tracking-widest uppercase">
+                {currentCamera.name}
+              </div>
+
+              {/* Camera Toggle in Fullscreen */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-md border border-zinc-800/80 p-1 rounded-full flex gap-1">
+                {Object.values(CAMERAS).map((camera) => (
+                  <button
+                    key={camera.id}
+                    onClick={() => setActiveCamera(camera.id)}
+                    className={`px-4 py-2 text-sm font-semibold transition-all rounded-full flex items-center gap-2 ${
+                      activeCamera === camera.id
+                        ? 'text-white bg-zinc-700/80'
+                        : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
+                  >
+                    <PelleLogo className="w-3 h-3" />
+                    {camera.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Close Fullscreen Button */}
+              <button
+                data-testid="close-fullscreen-btn"
+                onClick={() => setIsFullscreen(false)}
+                className="absolute top-6 left-1/2 -translate-x-1/2 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 text-zinc-300 hover:text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors"
+              >
+                <Minimize2 className="w-4 h-4" />
+                <span className="text-sm font-medium">Stäng</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Status Bento Grid */}
         <div className="grid grid-cols-2 gap-4 px-6 mt-6">
@@ -369,6 +463,48 @@ const Dashboard = ({ user: propUser, logout }) => {
               Kamerainställningar - {currentCamera.name}
             </h3>
 
+            {/* Stream URL Input */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-zinc-300">
+                  <Link className="w-4 h-4" />
+                  <span className="text-sm font-medium">Stream URL</span>
+                </div>
+                {streamSaved && (
+                  <span className="text-emerald-400 text-xs font-mono flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Sparad
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  data-testid="stream-url-input"
+                  type="text"
+                  placeholder="http://192.168.1.50/stream"
+                  value={streamUrlInput || currentSettings.stream_url || ""}
+                  onChange={(e) => {
+                    setStreamUrlInput(e.target.value);
+                    setStreamSaved(false);
+                  }}
+                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+                />
+                <button
+                  data-testid="save-stream-url-btn"
+                  onClick={() => {
+                    updateCameraSetting(activeCamera, 'stream_url', streamUrlInput || null);
+                    setStreamSaved(true);
+                    setTimeout(() => setStreamSaved(false), 2000);
+                  }}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-xl transition-colors"
+                >
+                  Spara
+                </button>
+              </div>
+              <p className="text-zinc-600 text-[10px] font-mono">
+                Ange lokal IP-adress för MJPEG-ström (endast tillgänglig inom samma WiFi)
+              </p>
+            </div>
+
             {/* Brightness Slider */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
@@ -405,6 +541,29 @@ const Dashboard = ({ user: propUser, logout }) => {
                 step={1}
                 className="dark-slider"
               />
+            </div>
+
+            {/* Sound Sensitivity Slider */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-zinc-300">
+                  <Volume2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Ljudkänslighet</span>
+                </div>
+                <span className="text-sm font-mono text-zinc-500">{alertSettings.sound_sensitivity || 50}%</span>
+              </div>
+              <Slider
+                data-testid="sound-sensitivity-slider"
+                value={[alertSettings.sound_sensitivity || 50]}
+                onValueChange={([value]) => updateAlertSetting('sound_sensitivity', value)}
+                max={100}
+                step={1}
+                className="dark-slider"
+              />
+              <div className="flex justify-between text-[10px] font-mono text-zinc-600">
+                <span>Låg</span>
+                <span>Hög</span>
+              </div>
             </div>
           </div>
         )}

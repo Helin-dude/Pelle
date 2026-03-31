@@ -56,13 +56,10 @@ const LoginPage = ({ user }) => {
 
           {/* Title */}
           <h1 className="text-4xl font-black tracking-tighter text-white mb-2 font-sans">
-            CCTV Monitor
+            Pelle
           </h1>
-          <p className="text-zinc-500 font-mono text-xs tracking-widest uppercase mb-2">
-            Surveillance Dashboard
-          </p>
-          <p className="text-zinc-600 text-sm mb-12 max-w-xs">
-            Monitor your cameras in real-time with motion and sound alerts
+          <p className="text-zinc-500 font-mono text-xs tracking-widest uppercase mb-12">
+            Kameraövervakning
           </p>
 
           {/* Google Login Button */}
@@ -89,7 +86,7 @@ const LoginPage = ({ user }) => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
+            Fortsätt med Google
           </button>
 
           {/* Security Note */}
