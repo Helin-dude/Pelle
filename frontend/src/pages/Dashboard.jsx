@@ -23,22 +23,34 @@ import {
 import { Slider } from "../components/ui/slider";
 import { Switch } from "../components/ui/switch";
 
-// Custom Pelle Logo - Green P with camera lens in the hole (light theme)
+// Custom Pelle Logo - Green P with cute cartoon camera lens
 const PelleLogo = ({ className }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Green P letter */}
     <path
       d="M25 15h30c16.569 0 30 13.431 30 30s-13.431 30-30 30H45v20c0 2.761-2.239 5-5 5H30c-2.761 0-5-2.239-5-5V15z"
       fill="#22c55e"
     />
+    {/* Inner cutout for P hole */}
     <path
       d="M45 30h10c8.284 0 15 6.716 15 15s-6.716 15-15 15H45V30z"
-      fill="#ffffff"
+      fill="#fafaf8"
     />
-    <circle cx="55" cy="45" r="12" fill="#f0fdf4" stroke="#86efac" strokeWidth="2"/>
-    <circle cx="55" cy="45" r="8" fill="#dcfce7"/>
-    <circle cx="55" cy="45" r="5" fill="#bbf7d0"/>
-    <circle cx="52" cy="42" r="2" fill="#22c55e" opacity="0.8"/>
-    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5" opacity="0.6"/>
+    {/* Camera lens body - cartoon style */}
+    <circle cx="55" cy="45" r="13" fill="#1a1a2e" stroke="#16213e" strokeWidth="2"/>
+    {/* Outer lens ring - shiny */}
+    <circle cx="55" cy="45" r="10" fill="#0f3460" stroke="#e94560" strokeWidth="1.5"/>
+    {/* Inner lens - gradient effect */}
+    <circle cx="55" cy="45" r="7" fill="#16213e"/>
+    {/* Lens iris rings */}
+    <circle cx="55" cy="45" r="5" fill="#1a1a2e" stroke="#533483" strokeWidth="0.5"/>
+    <circle cx="55" cy="45" r="3" fill="#0f3460"/>
+    {/* Cute eye-like reflection - big */}
+    <ellipse cx="52" cy="42" rx="2.5" ry="3" fill="white" opacity="0.9"/>
+    {/* Small reflection */}
+    <circle cx="58" cy="47" r="1" fill="white" opacity="0.6"/>
+    {/* Lens sparkle */}
+    <path d="M50 40 L51 42 L49 42 Z" fill="#e94560" opacity="0.8"/>
   </svg>
 );
 
@@ -202,32 +214,32 @@ const Dashboard = ({ user: propUser, logout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 flex justify-center">
-      <div className="w-full max-w-md min-h-screen bg-white/90 backdrop-blur-sm flex flex-col relative border-x border-green-100 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-b from-[#f8faf5] to-[#eef4e5] flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-[#fafaf8]/95 backdrop-blur-sm flex flex-col relative border-x border-[#e5ead8] shadow-xl">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl border-2 border-green-200 flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-[#fafaf8] rounded-xl border-2 border-[#d4dfc4] flex items-center justify-center shadow-sm">
               <PelleLogo className="w-7 h-7" />
             </div>
             <div>
               <p className="text-[10px] font-mono tracking-widest text-green-600 uppercase">Välkommen</p>
-              <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
+              <p className="text-sm font-semibold text-gray-800">{user?.name || 'User'}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               data-testid="settings-toggle-btn"
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-xl bg-white border-2 border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300 transition-colors shadow-sm"
+              className="p-2 rounded-xl bg-[#fafaf8] border-2 border-[#d4dfc4] text-green-600 hover:bg-[#f0f4e8] hover:border-green-300 transition-colors shadow-sm"
             >
               <Settings className="w-4 h-4" />
             </button>
             <button
               data-testid="logout-btn"
               onClick={logout}
-              className="p-2 rounded-xl bg-white border-2 border-green-200 text-green-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
+              className="p-2 rounded-xl bg-[#fafaf8] border-2 border-[#d4dfc4] text-green-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -235,7 +247,7 @@ const Dashboard = ({ user: propUser, logout }) => {
         </div>
 
         {/* Camera Toggle */}
-        <div className="bg-white border-2 border-green-200 p-1.5 rounded-full flex gap-1 mx-6 mt-4 shadow-sm">
+        <div className="bg-[#fafaf8] border-2 border-[#d4dfc4] p-1.5 rounded-full flex gap-1 mx-6 mt-4 shadow-sm">
           {Object.values(CAMERAS).map((camera) => (
             <button
               key={camera.id}
@@ -244,7 +256,7 @@ const Dashboard = ({ user: propUser, logout }) => {
               className={`relative z-10 px-6 py-3 text-sm font-semibold flex-1 transition-all rounded-full flex items-center justify-center gap-2 ${
                 activeCamera === camera.id
                   ? 'text-white bg-green-500 shadow-md'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-green-50'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-[#f0f4e8]'
               }`}
             >
               <PelleLogo className="w-4 h-4" />
@@ -256,7 +268,7 @@ const Dashboard = ({ user: propUser, logout }) => {
         {/* Video Stream Container */}
         <div 
           data-testid="video-stream-container"
-          className="relative aspect-[4/3] w-[calc(100%-3rem)] mx-6 mt-6 bg-gray-900 rounded-[2rem] overflow-hidden border-2 border-green-200 shadow-lg"
+          className="relative aspect-[4/3] w-[calc(100%-3rem)] mx-6 mt-6 bg-gray-900 rounded-[2rem] overflow-hidden border-2 border-[#d4dfc4] shadow-lg"
           style={{
             filter: `brightness(${currentSettings.brightness / 50}) contrast(${currentSettings.contrast / 50})`
           }}
@@ -420,12 +432,12 @@ const Dashboard = ({ user: propUser, logout }) => {
           {/* Connection Strength */}
           <div 
             data-testid="connection-status-card"
-            className="bg-white border-2 border-green-200 rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
           >
             <span className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
               Anslutning
             </span>
-            <div className="text-xl font-mono text-gray-900 flex items-center gap-2">
+            <div className="text-xl font-mono text-gray-800 flex items-center gap-2">
               <Wifi className="w-5 h-5 text-green-500" />
               <span className="text-green-600">Stark</span>
             </div>
@@ -434,12 +446,12 @@ const Dashboard = ({ user: propUser, logout }) => {
           {/* Uptime */}
           <div 
             data-testid="uptime-status-card"
-            className="bg-white border-2 border-green-200 rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
           >
             <span className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
               Drifttid
             </span>
-            <div className="text-xl font-mono text-gray-900 flex items-center gap-2">
+            <div className="text-xl font-mono text-gray-800 flex items-center gap-2">
               <Clock className="w-5 h-5 text-green-500" />
               {formatUptime(uptime)}
             </div>
@@ -449,7 +461,7 @@ const Dashboard = ({ user: propUser, logout }) => {
         {/* Security Notice */}
         <div 
           data-testid="security-notice"
-          className="mx-6 mt-4 p-3 bg-green-100 border-2 border-green-200 rounded-xl flex items-center gap-3"
+          className="mx-6 mt-4 p-3 bg-[#f0f4e8] border-2 border-[#d4dfc4] rounded-xl flex items-center gap-3"
         >
           <ShieldCheck className="w-5 h-5 text-green-600 flex-shrink-0" />
           <p className="text-green-700 text-xs font-mono">
@@ -466,14 +478,14 @@ const Dashboard = ({ user: propUser, logout }) => {
           {/* Motion Alert */}
           <div 
             data-testid="motion-alert-card"
-            className="bg-white border-2 border-green-200 rounded-2xl p-4 flex items-center justify-between shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${alertSettings.motion_enabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                 <Activity className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Rörelsedetektering</p>
+                <p className="text-sm font-medium text-gray-800">Rörelsedetektering</p>
                 <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">
                   {alertSettings.motion_enabled ? 'Aktiv' : 'Inaktiv'}
                 </p>
@@ -489,14 +501,14 @@ const Dashboard = ({ user: propUser, logout }) => {
           {/* Sound Alert */}
           <div 
             data-testid="sound-alert-card"
-            className="bg-white border-2 border-green-200 rounded-2xl p-4 flex items-center justify-between shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${alertSettings.sound_enabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                 <Volume2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Ljuddetektering</p>
+                <p className="text-sm font-medium text-gray-800">Ljuddetektering</p>
                 <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">
                   {alertSettings.sound_enabled ? 'Aktiv' : 'Inaktiv'}
                 </p>
@@ -514,7 +526,7 @@ const Dashboard = ({ user: propUser, logout }) => {
         {showSettings && (
           <div 
             data-testid="camera-settings-panel"
-            className="bg-white border-2 border-green-200 rounded-[2rem] p-6 mx-6 mt-6 flex flex-col gap-6 shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-[2rem] p-6 mx-6 mt-6 flex flex-col gap-6 shadow-sm"
           >
             <h3 className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
               Kamerainställningar - {currentCamera.name}
@@ -543,7 +555,7 @@ const Dashboard = ({ user: propUser, logout }) => {
                     setStreamUrlInput(e.target.value);
                     setStreamSaved(false);
                   }}
-                  className="flex-1 bg-green-50 border-2 border-green-200 rounded-xl px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-400"
+                  className="flex-1 bg-[#f0f4e8] border-2 border-[#d4dfc4] rounded-xl px-4 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-green-400"
                 />
                 <button
                   data-testid="save-stream-url-btn"

@@ -14,34 +14,34 @@ body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #f0fdf4;
+    background-color: #f8faf5;
 }
 
 code {
     font-family: var(--font-mono);
 }
 
-/* Light Green Theme Variables */
+/* Soft Green Theme Variables */
 @layer base {
     :root {
-        --background: 138 76% 97%;
+        --background: 80 30% 97%;
         --foreground: 0 0% 9%;
-        --card: 0 0% 100%;
+        --card: 60 20% 99%;
         --card-foreground: 0 0% 9%;
-        --popover: 0 0% 100%;
+        --popover: 60 20% 99%;
         --popover-foreground: 0 0% 9%;
         --primary: 142 76% 36%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 138 76% 94%;
+        --secondary: 80 30% 94%;
         --secondary-foreground: 0 0% 9%;
-        --muted: 138 30% 90%;
+        --muted: 80 20% 92%;
         --muted-foreground: 0 0% 45%;
         --accent: 142 76% 36%;
         --accent-foreground: 0 0% 100%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
-        --border: 142 30% 82%;
-        --input: 142 30% 82%;
+        --border: 100 25% 85%;
+        --input: 100 25% 85%;
         --ring: 142 76% 36%;
         --radius: 0.75rem;
     }
@@ -163,3 +163,4 @@ code {
 .flip-horizontal { transform: scaleX(-1); }
 .flip-vertical { transform: scaleY(-1); }
 .flip-both { transform: scale(-1, -1); }
+

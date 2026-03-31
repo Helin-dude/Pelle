@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 
-// Custom Pelle Logo - Green P with camera lens in the hole (light theme)
+// Custom Pelle Logo - Green P with cute cartoon camera lens
 const PelleLogo = ({ className }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Green P letter */}
@@ -13,17 +13,23 @@ const PelleLogo = ({ className }) => (
     {/* Inner cutout for P hole */}
     <path
       d="M45 30h10c8.284 0 15 6.716 15 15s-6.716 15-15 15H45V30z"
-      fill="#ffffff"
+      fill="#fafaf8"
     />
-    {/* Camera lens outer ring */}
-    <circle cx="55" cy="45" r="12" fill="#f0fdf4" stroke="#86efac" strokeWidth="2"/>
-    {/* Camera lens inner rings */}
-    <circle cx="55" cy="45" r="8" fill="#dcfce7"/>
-    <circle cx="55" cy="45" r="5" fill="#bbf7d0"/>
-    {/* Lens reflection/highlight */}
-    <circle cx="52" cy="42" r="2" fill="#22c55e" opacity="0.8"/>
-    {/* Outer lens ring detail */}
-    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5" opacity="0.6"/>
+    {/* Camera lens body - cartoon style */}
+    <circle cx="55" cy="45" r="13" fill="#1a1a2e" stroke="#16213e" strokeWidth="2"/>
+    {/* Outer lens ring - shiny */}
+    <circle cx="55" cy="45" r="10" fill="#0f3460" stroke="#e94560" strokeWidth="1.5"/>
+    {/* Inner lens - gradient effect */}
+    <circle cx="55" cy="45" r="7" fill="#16213e"/>
+    {/* Lens iris rings */}
+    <circle cx="55" cy="45" r="5" fill="#1a1a2e" stroke="#533483" strokeWidth="0.5"/>
+    <circle cx="55" cy="45" r="3" fill="#0f3460"/>
+    {/* Cute eye-like reflection - big */}
+    <ellipse cx="52" cy="42" rx="2.5" ry="3" fill="white" opacity="0.9"/>
+    {/* Small reflection */}
+    <circle cx="58" cy="47" r="1" fill="white" opacity="0.6"/>
+    {/* Lens sparkle */}
+    <path d="M50 40 L51 42 L49 42 Z" fill="#e94560" opacity="0.8"/>
   </svg>
 );
 
@@ -44,13 +50,13 @@ const LoginPage = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 flex justify-center">
-      <div className="w-full max-w-md min-h-screen bg-white/80 backdrop-blur-sm flex flex-col relative border-x border-green-100 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-b from-[#f8faf5] to-[#eef4e5] flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-[#fafaf8]/90 backdrop-blur-sm flex flex-col relative border-x border-[#e5ead8] shadow-xl">
         <div className="flex flex-col items-center justify-center flex-1 px-8 text-center">
           {/* Pelle Logo - Green P with camera lens */}
           <div 
             data-testid="app-logo"
-            className="w-28 h-28 bg-white rounded-[2rem] border-2 border-green-200 mb-8 flex items-center justify-center shadow-lg shadow-green-200/50"
+            className="w-28 h-28 bg-[#fafaf8] rounded-[2rem] border-2 border-[#d4dfc4] mb-8 flex items-center justify-center shadow-lg shadow-green-200/30"
           >
             <PelleLogo className="w-20 h-20" />
           </div>
@@ -91,7 +97,7 @@ const LoginPage = ({ user }) => {
           </button>
 
           {/* Security Note */}
-          <div className="mt-10 p-4 bg-green-50 border border-green-200 rounded-2xl max-w-xs">
+          <div className="mt-10 p-4 bg-[#f0f4e8] border border-[#d4dfc4] rounded-2xl max-w-xs">
             <div className="flex items-center justify-center gap-2 mb-2">
               <ShieldCheck className="w-4 h-4 text-green-600" />
               <p className="text-green-700 text-xs font-semibold uppercase tracking-wide">
@@ -104,7 +110,7 @@ const LoginPage = ({ user }) => {
           </div>
 
           {/* Footer */}
-          <p className="text-green-400 text-[10px] font-mono tracking-widest uppercase mt-10">
+          <p className="text-[#a8b898] text-[10px] font-mono tracking-widest uppercase mt-10">
             Säker • Privat • Lokalt Nätverk
           </p>
         </div>
