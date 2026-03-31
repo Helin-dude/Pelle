@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-ro
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import AuthCallback from "./pages/AuthCallback";
+import SettingsPage from "./pages/SettingsPage";
+import { LocalConfigProvider } from "./contexts/LocalConfigContext";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -102,6 +104,7 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage user={user} />} />
+      <Route path="/settings" element={<SettingsPage />} />
       <Route
         path="/"
         element={
@@ -125,9 +128,11 @@ function AppRouter() {
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
-        <AppRouter />
-      </BrowserRouter>
+      <LocalConfigProvider>
+        <BrowserRouter>
+          <AppRouter />
+        </BrowserRouter>
+      </LocalConfigProvider>
     </div>
   );
 }
