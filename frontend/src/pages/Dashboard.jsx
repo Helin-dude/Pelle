@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { 
-  Camera, 
   Battery, 
   Wifi, 
   Clock, 
@@ -10,10 +9,30 @@ import {
   Sun, 
   Contrast,
   LogOut,
-  Settings
+  Settings,
+  ShieldCheck
 } from "lucide-react";
 import { Slider } from "../components/ui/slider";
 import { Switch } from "../components/ui/switch";
+
+// Custom Pelle Logo - Green P with camera lens in the hole
+const PelleLogo = ({ className }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M25 15h30c16.569 0 30 13.431 30 30s-13.431 30-30 30H45v20c0 2.761-2.239 5-5 5H30c-2.761 0-5-2.239-5-5V15z"
+      fill="#22c55e"
+    />
+    <path
+      d="M45 30h10c8.284 0 15 6.716 15 15s-6.716 15-15 15H45V30z"
+      fill="#09090b"
+    />
+    <circle cx="55" cy="45" r="12" fill="#18181b" stroke="#3f3f46" strokeWidth="2"/>
+    <circle cx="55" cy="45" r="8" fill="#27272a"/>
+    <circle cx="55" cy="45" r="5" fill="#09090b"/>
+    <circle cx="52" cy="42" r="2" fill="#4ade80" opacity="0.6"/>
+    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1" opacity="0.5"/>
+  </svg>
+);
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -154,15 +173,11 @@ const Dashboard = ({ user: propUser, logout }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
-            {user?.picture && (
-              <img 
-                src={user.picture} 
-                alt={user.name}
-                className="w-8 h-8 rounded-full border border-zinc-800"
-              />
-            )}
+            <div className="w-10 h-10 bg-zinc-900 rounded-xl border border-zinc-800 flex items-center justify-center">
+              <PelleLogo className="w-7 h-7" />
+            </div>
             <div>
-              <p className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">Welcome back</p>
+              <p className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">Välkommen</p>
               <p className="text-sm font-semibold text-white">{user?.name || 'User'}</p>
             </div>
           </div>
@@ -197,7 +212,7 @@ const Dashboard = ({ user: propUser, logout }) => {
                   : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <Camera className="w-4 h-4" />
+              <PelleLogo className="w-4 h-4" />
               {camera.name}
             </button>
           ))}
@@ -257,11 +272,11 @@ const Dashboard = ({ user: propUser, logout }) => {
             className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3"
           >
             <span className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-              Connection
+              Anslutning
             </span>
             <div className="text-xl font-mono text-zinc-100 flex items-center gap-2">
               <Wifi className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400">Strong</span>
+              <span className="text-emerald-400">Stark</span>
             </div>
           </div>
 
@@ -271,7 +286,7 @@ const Dashboard = ({ user: propUser, logout }) => {
             className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3"
           >
             <span className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-              Uptime
+              Drifttid
             </span>
             <div className="text-xl font-mono text-zinc-100 flex items-center gap-2">
               <Clock className="w-5 h-5 text-zinc-400" />
@@ -280,10 +295,21 @@ const Dashboard = ({ user: propUser, logout }) => {
           </div>
         </div>
 
+        {/* Security Notice */}
+        <div 
+          data-testid="security-notice"
+          className="mx-6 mt-4 p-3 bg-emerald-950/30 border border-emerald-900/50 rounded-xl flex items-center gap-3"
+        >
+          <ShieldCheck className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+          <p className="text-emerald-400/80 text-xs font-mono">
+            Skyddad: Endast tillgänglig inom lokalt WiFi
+          </p>
+        </div>
+
         {/* Alerts Section */}
         <div className="flex flex-col gap-3 px-6 mt-6">
           <h3 className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-            Alerts
+            Varningar
           </h3>
           
           {/* Motion Alert */}
@@ -296,9 +322,9 @@ const Dashboard = ({ user: propUser, logout }) => {
                 <Activity className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">Motion Detection</p>
+                <p className="text-sm font-medium text-white">Rörelsedetektering</p>
                 <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
-                  {alertSettings.motion_enabled ? 'Active' : 'Inactive'}
+                  {alertSettings.motion_enabled ? 'Aktiv' : 'Inaktiv'}
                 </p>
               </div>
             </div>
@@ -319,9 +345,9 @@ const Dashboard = ({ user: propUser, logout }) => {
                 <Volume2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">Sound Detection</p>
+                <p className="text-sm font-medium text-white">Ljuddetektering</p>
                 <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
-                  {alertSettings.sound_enabled ? 'Active' : 'Inactive'}
+                  {alertSettings.sound_enabled ? 'Aktiv' : 'Inaktiv'}
                 </p>
               </div>
             </div>
@@ -340,7 +366,7 @@ const Dashboard = ({ user: propUser, logout }) => {
             className="bg-zinc-900 border border-zinc-800/60 rounded-[2rem] p-6 mx-6 mt-6 flex flex-col gap-6"
           >
             <h3 className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-              Camera Settings - {currentCamera.name}
+              Kamerainställningar - {currentCamera.name}
             </h3>
 
             {/* Brightness Slider */}
@@ -348,7 +374,7 @@ const Dashboard = ({ user: propUser, logout }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <Sun className="w-4 h-4" />
-                  <span className="text-sm font-medium">Brightness</span>
+                  <span className="text-sm font-medium">Ljusstyrka</span>
                 </div>
                 <span className="text-sm font-mono text-zinc-500">{currentSettings.brightness}%</span>
               </div>
@@ -367,7 +393,7 @@ const Dashboard = ({ user: propUser, logout }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <Contrast className="w-4 h-4" />
-                  <span className="text-sm font-medium">Contrast</span>
+                  <span className="text-sm font-medium">Kontrast</span>
                 </div>
                 <span className="text-sm font-mono text-zinc-500">{currentSettings.contrast}%</span>
               </div>

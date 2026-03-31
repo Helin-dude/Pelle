@@ -1,6 +1,30 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera } from "lucide-react";
+
+// Custom Pelle Logo - Green P with camera lens in the hole
+const PelleLogo = ({ className }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Green P letter */}
+    <path
+      d="M25 15h30c16.569 0 30 13.431 30 30s-13.431 30-30 30H45v20c0 2.761-2.239 5-5 5H30c-2.761 0-5-2.239-5-5V15z"
+      fill="#22c55e"
+    />
+    {/* Inner cutout for P hole */}
+    <path
+      d="M45 30h10c8.284 0 15 6.716 15 15s-6.716 15-15 15H45V30z"
+      fill="#09090b"
+    />
+    {/* Camera lens outer ring */}
+    <circle cx="55" cy="45" r="12" fill="#18181b" stroke="#3f3f46" strokeWidth="2"/>
+    {/* Camera lens inner rings */}
+    <circle cx="55" cy="45" r="8" fill="#27272a"/>
+    <circle cx="55" cy="45" r="5" fill="#09090b"/>
+    {/* Lens reflection/highlight */}
+    <circle cx="52" cy="42" r="2" fill="#4ade80" opacity="0.6"/>
+    {/* Outer lens ring detail */}
+    <circle cx="55" cy="45" r="10" fill="none" stroke="#22c55e" strokeWidth="1" opacity="0.5"/>
+  </svg>
+);
 
 const LoginPage = ({ user }) => {
   const navigate = useNavigate();
@@ -22,12 +46,12 @@ const LoginPage = ({ user }) => {
     <div className="min-h-screen bg-black flex justify-center">
       <div className="w-full max-w-md min-h-screen bg-zinc-950 flex flex-col relative border-x border-zinc-900 shadow-2xl">
         <div className="flex flex-col items-center justify-center flex-1 px-8 text-center">
-          {/* Logo */}
+          {/* Pelle Logo - Green P with camera lens */}
           <div 
             data-testid="app-logo"
-            className="w-20 h-20 bg-zinc-900 rounded-[2rem] border border-zinc-800 mb-8 flex items-center justify-center text-white shadow-2xl shadow-zinc-900/50"
+            className="w-24 h-24 bg-zinc-900 rounded-[2rem] border border-zinc-800 mb-8 flex items-center justify-center shadow-2xl shadow-emerald-900/20"
           >
-            <Camera className="w-10 h-10 text-zinc-300" />
+            <PelleLogo className="w-16 h-16" />
           </div>
 
           {/* Title */}
@@ -68,9 +92,19 @@ const LoginPage = ({ user }) => {
             Continue with Google
           </button>
 
+          {/* Security Note */}
+          <div className="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl max-w-xs">
+            <p className="text-zinc-500 text-[10px] font-mono tracking-wider uppercase mb-1">
+              🔒 Lokal Nätverkssäkerhet
+            </p>
+            <p className="text-zinc-600 text-xs">
+              Kameraströmmar är endast tillgängliga inom ditt hemma-WiFi nätverk
+            </p>
+          </div>
+
           {/* Footer */}
-          <p className="text-zinc-700 text-[10px] font-mono tracking-widest uppercase mt-12">
-            Secure • Private • Real-time
+          <p className="text-zinc-700 text-[10px] font-mono tracking-widest uppercase mt-8">
+            Secure • Private • Local Network Only
           </p>
         </div>
       </div>
