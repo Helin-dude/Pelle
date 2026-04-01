@@ -18,16 +18,12 @@ jobs:
           node-version: 20
       - name: Install and Build
         run: |
-          # Om det finns en frontend-mapp, gå in i den, annars stanna här
-          [ -d "frontend" ] && cd frontend || echo "Stannar i huvudmappen"
+          cd frontend
           npm install --force
           CI=false npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Den här letar efter både 'build' och 'dist' var de än ligger
-          path: |
-            **/build
-            **/dist
+          path: ./frontend/build
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
