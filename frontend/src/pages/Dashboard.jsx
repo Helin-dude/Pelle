@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { 
   Battery, 
   Wifi, 
   Clock, 
   Activity, 
   Volume2, 
-  LogOut,
   Settings,
   ShieldCheck,
   Maximize2,
@@ -42,10 +41,8 @@ const PLACEHOLDERS = {
   printer: "https://images.unsplash.com/photo-1642969164999-979483e21601?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzV8MHwxfHNlYXJjaHwxfHwzRCUyMHByaW50ZXIlMjBwcmludGluZ3xlbnwwfHx8fDE3NzQ5Nzg0OTJ8MA&ixlib=rb-4.1.0&q=85",
 };
 
-const Dashboard = ({ user: propUser, logout }) => {
-  const location = useLocation();
+const Dashboard = () => {
   const navigate = useNavigate();
-  const user = propUser || location.state?.user;
   
   // Use local config context
   const { config, batteryLevels, prusaStatus, updateAlerts, getStreamUrl } = useLocalConfig();
@@ -105,26 +102,17 @@ const Dashboard = ({ user: propUser, logout }) => {
               <PelleLogo className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-[10px] font-mono tracking-widest text-green-600 uppercase">Välkommen</p>
-              <p className="text-sm font-semibold text-gray-800">{user?.name || 'User'}</p>
+              <p className="text-lg font-bold text-gray-800">Pelle</p>
+              <p className="text-[10px] font-mono tracking-widest text-green-600 uppercase">Kameraövervakning</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              data-testid="settings-toggle-btn"
-              onClick={() => navigate('/settings')}
-              className="p-2 rounded-xl bg-[#fafaf8] border-2 border-[#d4dfc4] text-green-600 hover:bg-[#f0f4e8] hover:border-green-300 transition-colors shadow-sm"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-            <button
-              data-testid="logout-btn"
-              onClick={logout}
-              className="p-2 rounded-xl bg-[#fafaf8] border-2 border-[#d4dfc4] text-green-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors shadow-sm"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            data-testid="settings-toggle-btn"
+            onClick={() => navigate('/settings')}
+            className="p-2 rounded-xl bg-[#fafaf8] border-2 border-[#d4dfc4] text-green-600 hover:bg-[#f0f4e8] hover:border-green-300 transition-colors shadow-sm"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Camera Toggle */}
