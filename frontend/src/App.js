@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="App">
       <LocalConfigProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/Pelle">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
