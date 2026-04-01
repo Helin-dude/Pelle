@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Battery, 
@@ -13,8 +13,7 @@ import {
   RotateCw,
   FlipHorizontal2,
   FlipVertical2,
-  Thermometer,
-  Printer
+  Camera
 } from "lucide-react";
 import { Switch } from "../components/ui/switch";
 import { useLocalConfig } from "../contexts/LocalConfigContext";
@@ -35,21 +34,17 @@ const PelleLogo = ({ className }) => (
   </svg>
 );
 
-// Placeholder images
-const PLACEHOLDERS = {
-  pelle: "https://images.unsplash.com/photo-1505656029707-0fd14cabd9ec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxjdXRlJTIwZG9nJTIwc2xlZXBpbmclMjBiZWR8ZW58MHx8fHwxNzc0OTc4NDkyfDA&ixlib=rb-4.1.0&q=85",
-  printer: "https://images.unsplash.com/photo-1642969164999-979483e21601?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzV8MHwxfHNlYXJjaHwxfHwzRCUyMHByaW50ZXIlMjBwcmludGluZ3xlbnwwfHx8fDE3NzQ5Nzg0OTJ8MA&ixlib=rb-4.1.0&q=85",
-};
+// Placeholder image for Pelle
+const PLACEHOLDER = "https://images.unsplash.com/photo-1505656029707-0fd14cabd9ec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxjdXRlJTIwZG9nJTIwc2xlZXBpbmclMjBiZWR8ZW58MHx8fHwxNzc0OTc4NDkyfDA&ixlib=rb-4.1.0&q=85";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const videoRef = useRef(null);
   
   // Use local config context
-  const { config, batteryLevels, prusaStatus, updateAlerts, getStreamUrl } = useLocalConfig();
+  const { config, batteryLevels, updateAlerts, getStreamUrl } = useLocalConfig();
   
-  const [activeCamera, setActiveCamera] = useState("pelle");
   const [uptime, setUptime] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
   
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -73,13 +68,13 @@ const Dashboard = () => {
   };
 
   // Get current camera config from local storage
-  const currentCamera = config.cameras[activeCamera];
+  const currentCamera = config.cameras.pelle;
   const alertSettings = config.alerts;
 
   // Get stream URL - use local IP or placeholder
   const getVideoSrc = () => {
-    const streamUrl = getStreamUrl(activeCamera);
-    return streamUrl || PLACEHOLDERS[activeCamera];
+    const streamUrl = getStreamUrl('pelle');
+    return streamUrl || PLACEHOLDER;
   };
 
   // Get transform style for video
@@ -89,6 +84,23 @@ const Dashboard = () => {
     if (flipH) transform.push('scaleX(-1)');
     if (flipV) transform.push('scaleY(-1)');
     return transform.length > 0 ? transform.join(' ') : 'none';
+  };
+
+  // Screenshot function
+  const takeScreenshot = () => {
+    const img = videoRef.current;
+    if (!img) return;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    
+    const link = document.createElement('a');
+    link.download = `pelle-screenshot-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   };
 
   return (
@@ -115,77 +127,58 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Camera Toggle */}
-        <div className="bg-[#fafaf8] border-2 border-[#d4dfc4] p-1.5 rounded-full flex gap-1 mx-6 mt-4 shadow-sm">
-          {Object.entries(config.cameras).map(([id, camera]) => (
-            <button
-              key={id}
-              data-testid={`camera-toggle-${id}`}
-              onClick={() => setActiveCamera(id)}
-              className={`relative z-10 px-6 py-3 text-sm font-semibold flex-1 transition-all rounded-full flex items-center justify-center gap-2 ${
-                activeCamera === id
-                  ? 'text-white bg-green-500 shadow-md'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-[#f0f4e8]'
-              }`}
-            >
-              <PelleLogo className="w-4 h-4" />
-              {camera.name}
-            </button>
-          ))}
+        {/* Live & Battery Status Bar - Above Video */}
+        <div className="flex items-center justify-between mx-6 mt-4">
+          <div 
+            data-testid="live-indicator"
+            className="bg-red-500 text-white px-3 py-1.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-2"
+          >
+            <span className="w-2 h-2 bg-white rounded-full animate-live-pulse" />
+            LIVE
+          </div>
+          <div 
+            data-testid="battery-indicator"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] text-gray-700 px-3 py-1.5 rounded-full text-xs font-mono flex items-center gap-2"
+          >
+            <Battery className="w-4 h-4 text-green-500" />
+            {batteryLevels.pelle}%
+          </div>
         </div>
 
         {/* Video Stream Container */}
         <div 
           data-testid="video-stream-container"
-          className="relative aspect-[4/3] w-[calc(100%-3rem)] mx-6 mt-6 bg-gray-900 rounded-[2rem] overflow-hidden border-2 border-[#d4dfc4] shadow-lg"
+          className="relative aspect-[4/3] w-[calc(100%-3rem)] mx-6 mt-3 bg-gray-900 rounded-2xl overflow-hidden border-2 border-[#d4dfc4] shadow-lg"
           style={{
             filter: `brightness(${currentCamera.brightness / 50}) contrast(${currentCamera.contrast / 50})`
           }}
         >
           {/* Placeholder/Stream Image */}
           <img
+            ref={videoRef}
             data-testid="camera-feed-image"
             src={getVideoSrc()}
-            alt={`${currentCamera.name} camera feed`}
-            className="w-full h-full object-cover opacity-80"
+            alt="Pelle camera feed"
+            className="w-full h-full object-cover"
+            crossOrigin="anonymous"
           />
-
-          {/* Camera Corner Brackets */}
-          <div className="camera-corner camera-corner-tl" />
-          <div className="camera-corner camera-corner-tr" />
-          <div className="camera-corner camera-corner-bl" />
-          <div className="camera-corner camera-corner-br" />
-
-          {/* LIVE Overlay */}
-          <div 
-            data-testid="live-indicator"
-            className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-red-500/30 text-red-500 px-3 py-1.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
-          >
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-live-pulse" />
-            LIVE
-          </div>
-
-          {/* Battery Overlay */}
-          <div 
-            data-testid="battery-indicator"
-            className="absolute top-4 right-4 bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full text-xs font-mono flex items-center gap-2"
-          >
-            <Battery className="w-4 h-4" />
-            {batteryLevels[activeCamera]}%
-          </div>
-
-          {/* Camera Name Overlay */}
-          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-zinc-300 px-3 py-1.5 rounded-full text-[10px] font-mono tracking-widest uppercase">
-            {currentCamera.name}
-          </div>
 
           {/* Fullscreen Button */}
           <button
             data-testid="fullscreen-btn"
             onClick={() => setIsFullscreen(true)}
-            className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md border border-zinc-700/50 text-zinc-300 hover:text-white p-2 rounded-full transition-colors"
+            className="absolute bottom-4 right-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md"
           >
             <Maximize2 className="w-4 h-4" />
+          </button>
+
+          {/* Screenshot Button */}
+          <button
+            data-testid="screenshot-btn"
+            onClick={takeScreenshot}
+            className="absolute bottom-4 left-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md"
+          >
+            <Camera className="w-4 h-4" />
           </button>
         </div>
 
@@ -204,24 +197,20 @@ const Dashboard = () => {
             >
               <img
                 src={getVideoSrc()}
-                alt={`${currentCamera.name} camera feed`}
+                alt="Pelle camera feed"
                 className="max-w-full max-h-full object-contain transition-transform duration-300"
                 style={{ transform: getVideoTransform() }}
               />
 
               {/* Fullscreen Overlays */}
-              <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md border border-red-500/30 text-red-500 px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-2">
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-live-pulse" />
+              <div className="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-2">
+                <span className="w-2 h-2 bg-white rounded-full animate-live-pulse" />
                 LIVE
               </div>
 
-              <div className="absolute top-6 right-6 bg-black/60 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-sm font-mono flex items-center gap-2">
-                <Battery className="w-5 h-5" />
-                {batteryLevels[activeCamera]}%
-              </div>
-
-              <div className="absolute bottom-6 left-6 bg-black/60 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-xs font-mono tracking-widest uppercase">
-                {currentCamera.name}
+              <div className="absolute top-6 right-6 bg-white/90 text-gray-700 px-4 py-2 rounded-full text-sm font-mono flex items-center gap-2">
+                <Battery className="w-5 h-5 text-green-500" />
+                {batteryLevels.pelle}%
               </div>
 
               {/* Rotation & Flip Controls */}
@@ -229,7 +218,7 @@ const Dashboard = () => {
                 <button
                   data-testid="rotate-btn"
                   onClick={() => setRotation((prev) => (prev + 180) % 360)}
-                  className="p-3 bg-black/60 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 rounded-full transition-colors"
+                  className="p-3 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md"
                   title="Rotera 180°"
                 >
                   <RotateCw className="w-5 h-5" />
@@ -237,10 +226,10 @@ const Dashboard = () => {
                 <button
                   data-testid="flip-h-btn"
                   onClick={() => setFlipH(!flipH)}
-                  className={`p-3 backdrop-blur-md border rounded-full transition-colors ${
+                  className={`p-3 rounded-full transition-colors shadow-md ${
                     flipH 
-                      ? 'bg-green-500/80 border-green-400 text-white' 
-                      : 'bg-black/60 border-white/20 text-white hover:bg-white/20'
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-white/90 text-gray-700 hover:bg-white'
                   }`}
                   title="Spegla horisontellt"
                 >
@@ -249,33 +238,15 @@ const Dashboard = () => {
                 <button
                   data-testid="flip-v-btn"
                   onClick={() => setFlipV(!flipV)}
-                  className={`p-3 backdrop-blur-md border rounded-full transition-colors ${
+                  className={`p-3 rounded-full transition-colors shadow-md ${
                     flipV 
-                      ? 'bg-green-500/80 border-green-400 text-white' 
-                      : 'bg-black/60 border-white/20 text-white hover:bg-white/20'
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-white/90 text-gray-700 hover:bg-white'
                   }`}
                   title="Spegla vertikalt"
                 >
                   <FlipVertical2 className="w-5 h-5" />
                 </button>
-              </div>
-
-              {/* Camera Toggle in Fullscreen */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md border border-white/20 p-1 rounded-full flex gap-1">
-                {Object.entries(config.cameras).map(([id, camera]) => (
-                  <button
-                    key={id}
-                    onClick={() => setActiveCamera(id)}
-                    className={`px-4 py-2 text-sm font-semibold transition-all rounded-full flex items-center gap-2 ${
-                      activeCamera === id
-                        ? 'text-white bg-green-500'
-                        : 'text-white/60 hover:text-white'
-                    }`}
-                  >
-                    <PelleLogo className="w-3 h-3" />
-                    {camera.name}
-                  </button>
-                ))}
               </div>
 
               {/* Close Fullscreen Button */}
@@ -287,7 +258,7 @@ const Dashboard = () => {
                   setFlipH(false);
                   setFlipV(false);
                 }}
-                className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 px-4 py-2 rounded-full flex items-center gap-2 transition-colors"
+                className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 text-gray-700 hover:bg-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors shadow-md"
               >
                 <Minimize2 className="w-4 h-4" />
                 <span className="text-sm font-medium">Stäng</span>
@@ -296,34 +267,24 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Status Bento Grid */}
-        <div className="grid grid-cols-2 gap-4 px-6 mt-6">
+        {/* Status Row - Compact */}
+        <div className="grid grid-cols-2 gap-3 px-6 mt-4">
           {/* Connection Strength */}
           <div 
             data-testid="connection-status-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm"
           >
-            <span className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
-              Anslutning
-            </span>
-            <div className="text-xl font-mono text-gray-800 flex items-center gap-2">
-              <Wifi className="w-5 h-5 text-green-500" />
-              <span className="text-green-600">Stark</span>
-            </div>
+            <Wifi className="w-4 h-4 text-green-500" />
+            <span className="text-sm font-mono text-green-600">Stark</span>
           </div>
 
           {/* Uptime */}
           <div 
             data-testid="uptime-status-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-5 flex flex-col gap-3 shadow-sm"
+            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm"
           >
-            <span className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
-              Drifttid
-            </span>
-            <div className="text-xl font-mono text-gray-800 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-green-500" />
-              {formatUptime(uptime)}
-            </div>
+            <Clock className="w-4 h-4 text-green-500" />
+            <span className="text-sm font-mono text-gray-700">{formatUptime(uptime)}</span>
           </div>
         </div>
 
@@ -390,61 +351,6 @@ const Dashboard = () => {
             />
           </div>
         </div>
-
-        {/* Prusa Status - Only show when on Printer tab and enabled */}
-        {activeCamera === 'printer' && config.prusa.enabled && (
-          <div className="mx-6 mt-6">
-            <h3 className="text-[10px] font-mono tracking-widest text-green-600 uppercase mb-3">
-              3D-Skrivare Status
-            </h3>
-            <div className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 shadow-sm">
-              {prusaStatus.connected ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-green-600 text-sm">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <span className="font-medium">Ansluten till PrusaLink</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#f0f4e8] rounded-xl p-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-orange-500 mb-1">
-                        <Thermometer className="w-4 h-4" />
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{prusaStatus.nozzleTemp}°</p>
-                      <p className="text-[9px] font-mono text-gray-500 uppercase">Munstycke</p>
-                    </div>
-                    <div className="bg-[#f0f4e8] rounded-xl p-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-orange-500 mb-1">
-                        <Thermometer className="w-4 h-4" />
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{prusaStatus.bedTemp}°</p>
-                      <p className="text-[9px] font-mono text-gray-500 uppercase">Bädd</p>
-                    </div>
-                    <div className="bg-[#f0f4e8] rounded-xl p-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-green-500 mb-1">
-                        <Printer className="w-4 h-4" />
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{prusaStatus.progress}%</p>
-                      <p className="text-[9px] font-mono text-gray-500 uppercase">Progress</p>
-                    </div>
-                  </div>
-                  {prusaStatus.printing && (
-                    <div className="w-full bg-[#e5ead8] rounded-full h-2 mt-2">
-                      <div 
-                        className="bg-green-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${prusaStatus.progress}%` }}
-                      />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-gray-500 text-sm">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                  <span>Ej ansluten - Konfigurera i inställningar</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Bottom Spacing */}
         <div className="h-8" />
