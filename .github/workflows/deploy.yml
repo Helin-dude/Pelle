@@ -18,12 +18,16 @@ jobs:
           node-version: 20
       - name: Install and Build
         run: |
-          cd frontend
-          npm install --legacy-peer-deps
+          # Om det finns en frontend-mapp, gå in i den, annars stanna här
+          [ -d "frontend" ] && cd frontend || echo "Stannar i huvudmappen"
+          npm install --force
           CI=false npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/build
+          # Den här letar efter både 'build' och 'dist' var de än ligger
+          path: |
+            **/build
+            **/dist
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
