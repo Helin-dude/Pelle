@@ -1,62 +1,35 @@
-# CCTV Monitor App - PRD
+# Pelle - CCTV Kameraövervakning
 
-## Original Problem Statement
-Build a CCTV camera monitoring app with:
-- Two cameras named "Pelle" and "Printer"
-- Google login authentication
-- Live MJPEG stream display with placeholder images
-- LIVE indicator and battery percentage overlay
-- Status section with Connection Strength and Uptime
-- Motion detection and sound alerts
-- Camera settings (brightness, contrast)
-- Dark modern CCTV aesthetic
-- Security: Only accessible within same WiFi network
+## Problembeskrivning
+En-kamera React SPA ("Pelle") för lokal hosting via GitHub Pages. Ljust grönt tema, ingen autentisering, localStorage för kamera-IP, PWA-stöd.
 
-## User Personas
-- **Home User**: Monitors cameras on local network for security
-- **Pet Owner**: Watches pet cam (Pelle) remotely within home
+## Kärnfunktioner (Implementerade)
+- Enkel kamera-dashboard ("Pelle") med MJPEG-stream
+- Inställningssida med localStorage (LocalConfigContext)
+- React Router med `basename="/Pelle"` för GitHub Pages
+- PWA manifest och SVG-ikoner
+- Ljust grönt tema med tecknad kamera-logotyp
+- Fullscreen med rotera 180, spegla horisontellt/vertikalt
+- Screenshot-knapp
+- Kompakta statusrutor (anslutningsstyrka, drifttid)
+- LIVE-indikator (röd vid anslutning, grå vid offline)
+- Batteriprocentvisning ovanför video
+- Zoom-knappar (+/-) på höger sida av videospelaren
+- Faktisk kamera-drifttid (baserad på anslutningsstatus)
+- Rörelse- och ljuddetekteringsvarningar med switchar
 
-## Core Requirements (Static)
-1. Google OAuth authentication via Emergent Auth
-2. Dual camera switching (Pelle/Printer)
-3. Live video feed with overlays
-4. Camera settings persistence
-5. Alert toggles (motion/sound)
-6. Local network security model
+## Teknikstack
+- Frontend: React.js, Tailwind CSS, Lucide React, Shadcn UI
+- State: React Context + localStorage
+- Deploy: GitHub Pages (statisk)
+- Backend: Ej använd
 
-## What's Been Implemented (2026-03-31)
-- ✅ Google OAuth login with Emergent Auth
-- ✅ Custom logo (green P with camera lens)
-- ✅ Dashboard with camera toggle
-- ✅ Video stream container with LIVE/battery overlays
-- ✅ Status cards (Connection, Uptime)
-- ✅ Motion & Sound alert toggles
-- ✅ Camera settings panel (brightness/contrast sliders)
-- ✅ Swedish localization
-- ✅ Security notice for local WiFi
-- ✅ Dark CCTV aesthetic with Outfit/JetBrains Mono fonts
-- ✅ Mobile-first responsive design
+## Kritiska regler
+- ALDRIG ta bort `basename="/Pelle"` från App.js
+- ALDRIG ta bort `homepage` från package.json
+- Ingen autentisering
+- Allt på svenska
 
-## Architecture
-- **Frontend**: React + Tailwind CSS + Shadcn/UI
-- **Backend**: FastAPI + MongoDB
-- **Auth**: Emergent Google OAuth
-
-## Prioritized Backlog
-### P0 (Critical)
-- None remaining
-
-### P1 (Important)
-- Stream URL configuration per camera
-- Actual MJPEG stream integration
-- Push notifications for alerts
-
-### P2 (Nice to have)
-- Recording/snapshot functionality
-- Multi-user support
-- Camera scheduling
-
-## Next Tasks
-1. Add ability to configure actual camera stream URLs
-2. Implement real motion detection algorithm
-3. Add sound detection with mic access
+## Backlog
+- P1: Verifiera dynamisk batterihämtning från `/battery`-endpoint
+- P2: Rensa bort oanvända backend-filer

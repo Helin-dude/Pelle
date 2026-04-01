@@ -13,7 +13,9 @@ import {
   RotateCw,
   FlipHorizontal2,
   FlipVertical2,
-  Camera
+  Camera,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react";
 import { Switch } from "../components/ui/switch";
 import { useLocalConfig } from "../contexts/LocalConfigContext";
@@ -44,7 +46,13 @@ const Dashboard = () => {
   // Use local config context
   const { config, batteryLevels, updateAlerts, getStreamUrl } = useLocalConfig();
   
-  const [uptime, setUptime] = useState(0);
+  // Camera connection state
+  const [isConnected, setIsConnected] = useState(false);
+  const [cameraUptime, setCameraUptime] = useState(0);
+  const [connectionStartTime, setConnectionStartTime] = useState(null);
+  
+  // Zoom state
+  const [zoom, setZoom] = useState(1);
   
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -52,13 +60,58 @@ const Dashboard = () => {
   const [flipH, setFlipH] = useState(false);
   const [flipV, setFlipV] = useState(false);
 
-  // Uptime counter
+  // Check camera connection
   useEffect(() => {
-    const interval = setInterval(() => {
-      setUptime(prev => prev + 1);
-    }, 1000);
+    const checkConnection = async () => {
+      const streamUrl = getStreamUrl('pelle');
+      if (!streamUrl) {
+        setIsConnected(false);
+        return;
+      }
+      
+      try {
+        // Try to fetch a small part of the stream to check connection
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        const response = await fetch(streamUrl, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        setIsConnected(true);
+        
+        // Set connection start time if not already set
+        if (!connectionStartTime) {
+          setConnectionStartTime(Date.now());
+        }
+      } catch (e) {
+        setIsConnected(false);
+        setConnectionStartTime(null);
+      }
+    };
+
+    checkConnection();
+    const interval = setInterval(checkConnection, 5000); // Check every 5 seconds
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [getStreamUrl, connectionStartTime]);
+
+  // Update camera uptime based on connection
+  useEffect(() => {
+    if (!isConnected || !connectionStartTime) {
+      setCameraUptime(0);
+      return;
+    }
+    
+    const interval = setInterval(() => {
+      setCameraUptime(Math.floor((Date.now() - connectionStartTime) / 1000));
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isConnected, connectionStartTime]);
 
   const formatUptime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
@@ -66,6 +119,10 @@ const Dashboard = () => {
     const secs = seconds % 60;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Zoom controls
+  const zoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
+  const zoomOut = () => setZoom(prev => Math.max(prev - 0.25, 1));
 
   // Get current camera config from local storage
   const currentCamera = config.cameras.pelle;
@@ -131,10 +188,10 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mx-6 mt-4">
           <div 
             data-testid="live-indicator"
-            className="bg-red-500 text-white px-3 py-1.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-2"
+            className={`${isConnected ? 'bg-red-500' : 'bg-gray-400'} text-white px-3 py-1.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-2`}
           >
-            <span className="w-2 h-2 bg-white rounded-full animate-live-pulse" />
-            LIVE
+            {isConnected && <span className="w-2 h-2 bg-white rounded-full animate-live-pulse" />}
+            {isConnected ? 'LIVE' : 'OFFLINE'}
           </div>
           <div 
             data-testid="battery-indicator"
@@ -154,14 +211,38 @@ const Dashboard = () => {
           }}
         >
           {/* Placeholder/Stream Image */}
-          <img
-            ref={videoRef}
-            data-testid="camera-feed-image"
-            src={getVideoSrc()}
-            alt="Pelle camera feed"
-            className="w-full h-full object-cover"
-            crossOrigin="anonymous"
-          />
+          <div className="w-full h-full overflow-hidden">
+            <img
+              ref={videoRef}
+              data-testid="camera-feed-image"
+              src={getVideoSrc()}
+              alt="Pelle camera feed"
+              className="w-full h-full object-cover transition-transform duration-200"
+              style={{ transform: `scale(${zoom})` }}
+              crossOrigin="anonymous"
+            />
+          </div>
+
+          {/* Zoom Controls - Right side */}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+            <button
+              data-testid="zoom-in-btn"
+              onClick={zoomIn}
+              className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md"
+              title="Zooma in"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button
+              data-testid="zoom-out-btn"
+              onClick={zoomOut}
+              className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md disabled:opacity-40"
+              title="Zooma ut"
+              disabled={zoom <= 1}
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+          </div>
 
           {/* Fullscreen Button */}
           <button
@@ -284,7 +365,7 @@ const Dashboard = () => {
             className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm"
           >
             <Clock className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-mono text-gray-700">{formatUptime(uptime)}</span>
+            <span className="text-sm font-mono text-gray-700">{formatUptime(cameraUptime)}</span>
           </div>
         </div>
 
