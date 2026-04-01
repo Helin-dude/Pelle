@@ -129,7 +129,7 @@ function App() {
   return (
     <div className="App">
       <LocalConfigProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/Pelle">
           <AppRouter />
         </BrowserRouter>
       </LocalConfigProvider>
