@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-// Default camera configuration
+// Default camera configuration - Only Pelle
 const DEFAULT_CONFIG = {
   cameras: {
     pelle: {
@@ -11,21 +11,7 @@ const DEFAULT_CONFIG = {
       batteryPath: '/battery',
       brightness: 50,
       contrast: 50,
-    },
-    printer: {
-      id: 'printer',
-      name: 'Printer',
-      ip: '192.168.1.185',
-      streamPath: '/stream',
-      batteryPath: '/battery',
-      brightness: 50,
-      contrast: 50,
     }
-  },
-  prusa: {
-    ip: '192.168.1.185',
-    apiKey: '',
-    enabled: false,
   },
   alerts: {
     motion_enabled: true,
@@ -61,16 +47,6 @@ export const LocalConfigProvider = ({ children }) => {
   // Battery states
   const [batteryLevels, setBatteryLevels] = useState({
     pelle: 100,
-    printer: 100,
-  });
-
-  // Prusa status
-  const [prusaStatus, setPrusaStatus] = useState({
-    nozzleTemp: 0,
-    bedTemp: 0,
-    progress: 0,
-    printing: false,
-    connected: false,
   });
 
   // Save config to localStorage whenever it changes
@@ -80,9 +56,9 @@ export const LocalConfigProvider = ({ children }) => {
 
   // Poll battery levels
   useEffect(() => {
-    const fetchBattery = async (cameraId) => {
-      const camera = config.cameras[cameraId];
-      if (!camera.ip) return;
+    const fetchBattery = async () => {
+      const camera = config.cameras.pelle;
+      if (!camera?.ip) return;
       
       try {
         const response = await fetch(`http://${camera.ip}${camera.batteryPath}`, {
@@ -93,7 +69,7 @@ export const LocalConfigProvider = ({ children }) => {
           const data = await response.json();
           setBatteryLevels(prev => ({
             ...prev,
-            [cameraId]: data.battery || data.level || 100,
+            pelle: data.battery || data.level || 100,
           }));
         }
       } catch (e) {
@@ -101,57 +77,11 @@ export const LocalConfigProvider = ({ children }) => {
       }
     };
 
-    const interval = setInterval(() => {
-      fetchBattery('pelle');
-      fetchBattery('printer');
-    }, 30000); // Poll every 30 seconds
-
-    // Initial fetch
-    fetchBattery('pelle');
-    fetchBattery('printer');
+    const interval = setInterval(fetchBattery, 30000); // Poll every 30 seconds
+    fetchBattery(); // Initial fetch
 
     return () => clearInterval(interval);
   }, [config.cameras]);
-
-  // Poll Prusa status
-  useEffect(() => {
-    if (!config.prusa.enabled || !config.prusa.ip || !config.prusa.apiKey) {
-      setPrusaStatus(prev => ({ ...prev, connected: false }));
-      return;
-    }
-
-    const fetchPrusaStatus = async () => {
-      try {
-        const response = await fetch(`http://${config.prusa.ip}/api/v1/status`, {
-          headers: {
-            'X-Api-Key': config.prusa.apiKey,
-          },
-          mode: 'cors',
-          signal: AbortSignal.timeout(5000),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setPrusaStatus({
-            nozzleTemp: data.printer?.temp_nozzle || data.nozzle?.temperature || 0,
-            bedTemp: data.printer?.temp_bed || data.bed?.temperature || 0,
-            progress: data.job?.progress || 0,
-            printing: data.printer?.state === 'PRINTING' || data.state?.flags?.printing || false,
-            connected: true,
-          });
-        } else {
-          setPrusaStatus(prev => ({ ...prev, connected: false }));
-        }
-      } catch (e) {
-        setPrusaStatus(prev => ({ ...prev, connected: false }));
-      }
-    };
-
-    const interval = setInterval(fetchPrusaStatus, 5000); // Poll every 5 seconds
-    fetchPrusaStatus(); // Initial fetch
-
-    return () => clearInterval(interval);
-  }, [config.prusa]);
 
   // Update functions
   const updateCamera = (cameraId, updates) => {
@@ -189,7 +119,7 @@ export const LocalConfigProvider = ({ children }) => {
 
   const getStreamUrl = (cameraId) => {
     const camera = config.cameras[cameraId];
-    if (!camera.ip) return null;
+    if (!camera?.ip) return null;
     return `http://${camera.ip}${camera.streamPath}`;
   };
 
@@ -202,9 +132,7 @@ export const LocalConfigProvider = ({ children }) => {
     <LocalConfigContext.Provider value={{
       config,
       batteryLevels,
-      prusaStatus,
       updateCamera,
-      updatePrusa,
       updateAlerts,
       getStreamUrl,
       resetConfig,
