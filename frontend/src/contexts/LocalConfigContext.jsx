@@ -6,7 +6,7 @@ const DEFAULT_CONFIG = {
     pelle: {
       id: 'pelle',
       name: 'Pelle',
-      ip: '192.168.1.184',
+      ip: '192.168.68.69',
       streamPath: '/stream',
       batteryPath: '/battery',
       brightness: 50,
