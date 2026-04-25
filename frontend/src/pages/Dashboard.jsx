@@ -20,7 +20,6 @@ import {
 import { Switch } from "../components/ui/switch";
 import { useLocalConfig } from "../contexts/LocalConfigContext";
 
-// Custom Pelle Logo - Green P with cute cartoon camera lens
 const PelleLogo = ({ className }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M25 15h30c16.569 0 30 13.431 30 30s-13.431 30-30 30H45v20c0 2.761-2.239 5-5 5H30c-2.761 0-5-2.239-5-5V15z" fill="#22c55e"/>
@@ -36,80 +35,69 @@ const PelleLogo = ({ className }) => (
   </svg>
 );
 
-// Placeholder image for Pelle
 const PLACEHOLDER = "https://images.unsplash.com/photo-1505656029707-0fd14cabd9ec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxjdXRlJTIwZG9nJTIwc2xlZXBpbmclMjBiZWR8ZW58MHx8fHwxNzc0OTc4NDkyfDA&ixlib=rb-4.1.0&q=85";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const imgRef = useRef(null);
   
-  // Use local config context
   const { config, batteryLevels, updateAlerts, getStreamUrl } = useLocalConfig();
   
-  // Camera connection state
   const [isConnected, setIsConnected] = useState(false);
   const [cameraUptime, setCameraUptime] = useState(0);
   const [connectionStartTime, setConnectionStartTime] = useState(null);
-  
-  // Zoom state
   const [zoom, setZoom] = useState(1);
-  
-  // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [flipH, setFlipH] = useState(false);
   const [flipV, setFlipV] = useState(false);
 
-  // Check camera connection
+  // Check connection by loading the image
   useEffect(() => {
-    const checkConnection = async () => {
-      const streamUrl = getStreamUrl('pelle');
-      if (!streamUrl) {
-        setIsConnected(false);
-        return;
-      }
-      
-      try {
-        // Try to fetch a small part of the stream to check connection
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-        
-        const response = await fetch(streamUrl, {
-          method: 'HEAD',
-          mode: 'no-cors',
-          signal: controller.signal,
-        });
-        
-        clearTimeout(timeoutId);
-        setIsConnected(true);
-        
-        // Set connection start time if not already set
-        if (!connectionStartTime) {
-          setConnectionStartTime(Date.now());
-        }
-      } catch (e) {
-        setIsConnected(false);
-        setConnectionStartTime(null);
+    const streamUrl = getStreamUrl('pelle');
+    if (!streamUrl) {
+      setIsConnected(false);
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      setIsConnected(true);
+      if (!connectionStartTime) {
+        setConnectionStartTime(Date.now());
       }
     };
+    img.onerror = () => {
+      setIsConnected(false);
+      setConnectionStartTime(null);
+    };
+    img.src = streamUrl;
 
-    checkConnection();
-    const interval = setInterval(checkConnection, 5000); // Check every 5 seconds
-    
+    const interval = setInterval(() => {
+      const testImg = new Image();
+      testImg.onload = () => {
+        setIsConnected(true);
+        setConnectionStartTime(prev => prev || Date.now());
+      };
+      testImg.onerror = () => {
+        setIsConnected(false);
+        setConnectionStartTime(null);
+      };
+      testImg.src = streamUrl + '?t=' + Date.now();
+    }, 5000);
+
     return () => clearInterval(interval);
   }, [getStreamUrl, connectionStartTime]);
 
-  // Update camera uptime based on connection
   useEffect(() => {
     if (!isConnected || !connectionStartTime) {
       setCameraUptime(0);
       return;
     }
-    
     const interval = setInterval(() => {
       setCameraUptime(Math.floor((Date.now() - connectionStartTime) / 1000));
     }, 1000);
-    
     return () => clearInterval(interval);
   }, [isConnected, connectionStartTime]);
 
@@ -120,21 +108,17 @@ const Dashboard = () => {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Zoom controls
   const zoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
   const zoomOut = () => setZoom(prev => Math.max(prev - 0.25, 1));
 
-  // Get current camera config from local storage
   const currentCamera = config.cameras.pelle;
   const alertSettings = config.alerts;
 
-  // Get stream URL - use local IP or placeholder
   const getVideoSrc = () => {
     const streamUrl = getStreamUrl('pelle');
     return streamUrl || PLACEHOLDER;
   };
 
-  // Get transform style for video
   const getVideoTransform = () => {
     let transform = [];
     if (rotation !== 0) transform.push(`rotate(${rotation}deg)`);
@@ -143,17 +127,14 @@ const Dashboard = () => {
     return transform.length > 0 ? transform.join(' ') : 'none';
   };
 
-  // Screenshot function
   const takeScreenshot = () => {
     const img = videoRef.current;
     if (!img) return;
-    
     const canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth || img.width;
     canvas.height = img.naturalHeight || img.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    
     const link = document.createElement('a');
     link.download = `pelle-screenshot-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.png`;
     link.href = canvas.toDataURL('image/png');
@@ -184,7 +165,7 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Live & Battery Status Bar - Above Video */}
+        {/* Live & Battery Status Bar */}
         <div className="flex items-center justify-between mx-6 mt-4">
           <div 
             data-testid="live-indicator"
@@ -210,7 +191,6 @@ const Dashboard = () => {
             filter: `brightness(${currentCamera.brightness / 50}) contrast(${currentCamera.contrast / 50})`
           }}
         >
-          {/* Placeholder/Stream Image */}
           <div className="w-full h-full overflow-hidden">
             <img
               ref={videoRef}
@@ -219,62 +199,33 @@ const Dashboard = () => {
               alt="Pelle camera feed"
               className="w-full h-full object-cover transition-transform duration-200"
               style={{ transform: `scale(${zoom})` }}
-              crossOrigin="anonymous"
             />
           </div>
 
-          {/* Zoom Controls - Right side */}
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-            <button
-              data-testid="zoom-in-btn"
-              onClick={zoomIn}
-              className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md"
-              title="Zooma in"
-            >
+            <button onClick={zoomIn} className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md">
               <ZoomIn className="w-4 h-4" />
             </button>
-            <button
-              data-testid="zoom-out-btn"
-              onClick={zoomOut}
-              className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md disabled:opacity-40"
-              title="Zooma ut"
-              disabled={zoom <= 1}
-            >
+            <button onClick={zoomOut} className="p-2 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md disabled:opacity-40" disabled={zoom <= 1}>
               <ZoomOut className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Fullscreen Button */}
-          <button
-            data-testid="fullscreen-btn"
-            onClick={() => setIsFullscreen(true)}
-            className="absolute bottom-4 right-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md"
-          >
+          <button onClick={() => setIsFullscreen(true)} className="absolute bottom-4 right-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md">
             <Maximize2 className="w-4 h-4" />
           </button>
 
-          {/* Screenshot Button */}
-          <button
-            data-testid="screenshot-btn"
-            onClick={takeScreenshot}
-            className="absolute bottom-4 left-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md"
-          >
+          <button onClick={takeScreenshot} className="absolute bottom-4 left-4 bg-white/90 text-gray-700 hover:bg-white p-2 rounded-full transition-colors shadow-md">
             <Camera className="w-4 h-4" />
           </button>
         </div>
 
         {/* Fullscreen Modal */}
         {isFullscreen && (
-          <div 
-            data-testid="fullscreen-modal"
-            className="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center"
-          >
-            {/* Fullscreen Video */}
+          <div className="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center">
             <div 
               className="relative w-full h-full flex items-center justify-center"
-              style={{
-                filter: `brightness(${currentCamera.brightness / 50}) contrast(${currentCamera.contrast / 50})`
-              }}
+              style={{ filter: `brightness(${currentCamera.brightness / 50}) contrast(${currentCamera.contrast / 50})` }}
             >
               <img
                 src={getVideoSrc()}
@@ -282,63 +233,27 @@ const Dashboard = () => {
                 className="max-w-full max-h-full object-contain transition-transform duration-300"
                 style={{ transform: getVideoTransform() }}
               />
-
-              {/* Fullscreen Overlays */}
               <div className="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-white rounded-full animate-live-pulse" />
                 LIVE
               </div>
-
               <div className="absolute top-6 right-6 bg-white/90 text-gray-700 px-4 py-2 rounded-full text-sm font-mono flex items-center gap-2">
                 <Battery className="w-5 h-5 text-green-500" />
                 {batteryLevels.pelle}%
               </div>
-
-              {/* Rotation & Flip Controls */}
               <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-                <button
-                  data-testid="rotate-btn"
-                  onClick={() => setRotation((prev) => (prev + 180) % 360)}
-                  className="p-3 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md"
-                  title="Rotera 180°"
-                >
+                <button onClick={() => setRotation((prev) => (prev + 180) % 360)} className="p-3 bg-white/90 text-gray-700 hover:bg-white rounded-full transition-colors shadow-md">
                   <RotateCw className="w-5 h-5" />
                 </button>
-                <button
-                  data-testid="flip-h-btn"
-                  onClick={() => setFlipH(!flipH)}
-                  className={`p-3 rounded-full transition-colors shadow-md ${
-                    flipH 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-white/90 text-gray-700 hover:bg-white'
-                  }`}
-                  title="Spegla horisontellt"
-                >
+                <button onClick={() => setFlipH(!flipH)} className={`p-3 rounded-full transition-colors shadow-md ${flipH ? 'bg-green-500 text-white' : 'bg-white/90 text-gray-700 hover:bg-white'}`}>
                   <FlipHorizontal2 className="w-5 h-5" />
                 </button>
-                <button
-                  data-testid="flip-v-btn"
-                  onClick={() => setFlipV(!flipV)}
-                  className={`p-3 rounded-full transition-colors shadow-md ${
-                    flipV 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-white/90 text-gray-700 hover:bg-white'
-                  }`}
-                  title="Spegla vertikalt"
-                >
+                <button onClick={() => setFlipV(!flipV)} className={`p-3 rounded-full transition-colors shadow-md ${flipV ? 'bg-green-500 text-white' : 'bg-white/90 text-gray-700 hover:bg-white'}`}>
                   <FlipVertical2 className="w-5 h-5" />
                 </button>
               </div>
-
-              {/* Close Fullscreen Button */}
               <button
-                data-testid="close-fullscreen-btn"
-                onClick={() => {
-                  setIsFullscreen(false);
-                  setRotation(0);
-                  setFlipH(false);
-                  setFlipV(false);
-                }}
+                onClick={() => { setIsFullscreen(false); setRotation(0); setFlipH(false); setFlipV(false); }}
                 className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 text-gray-700 hover:bg-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors shadow-md"
               >
                 <Minimize2 className="w-4 h-4" />
@@ -348,92 +263,55 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Status Row - Compact */}
+        {/* Status Row */}
         <div className="grid grid-cols-2 gap-3 px-6 mt-4">
-          {/* Connection Strength */}
-          <div 
-            data-testid="connection-status-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm"
-          >
+          <div className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm">
             <Wifi className="w-4 h-4 text-green-500" />
             <span className="text-sm font-mono text-green-600">Stark</span>
           </div>
-
-          {/* Uptime */}
-          <div 
-            data-testid="uptime-status-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm"
-          >
+          <div className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm">
             <Clock className="w-4 h-4 text-green-500" />
             <span className="text-sm font-mono text-gray-700">{formatUptime(cameraUptime)}</span>
           </div>
         </div>
 
         {/* Security Notice */}
-        <div 
-          data-testid="security-notice"
-          className="mx-6 mt-4 p-3 bg-[#f0f4e8] border-2 border-[#d4dfc4] rounded-xl flex items-center gap-3"
-        >
+        <div className="mx-6 mt-4 p-3 bg-[#f0f4e8] border-2 border-[#d4dfc4] rounded-xl flex items-center gap-3">
           <ShieldCheck className="w-5 h-5 text-green-600 flex-shrink-0" />
-          <p className="text-green-700 text-xs font-mono">
-            Skyddad: Endast tillgänglig inom lokalt WiFi
-          </p>
+          <p className="text-green-700 text-xs font-mono">Skyddad: Endast tillgänglig inom lokalt WiFi</p>
         </div>
 
         {/* Alerts Section */}
         <div className="flex flex-col gap-3 px-6 mt-6">
-          <h3 className="text-[10px] font-mono tracking-widest text-green-600 uppercase">
-            Varningar
-          </h3>
+          <h3 className="text-[10px] font-mono tracking-widest text-green-600 uppercase">Varningar</h3>
           
-          {/* Motion Alert */}
-          <div 
-            data-testid="motion-alert-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm"
-          >
+          <div data-testid="motion-alert-card" className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${alertSettings.motion_enabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                 <Activity className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-800">Rörelsedetektering</p>
-                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">
-                  {alertSettings.motion_enabled ? 'Aktiv' : 'Inaktiv'}
-                </p>
+                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">{alertSettings.motion_enabled ? 'Aktiv' : 'Inaktiv'}</p>
               </div>
             </div>
-            <Switch
-              data-testid="motion-alert-toggle"
-              checked={alertSettings.motion_enabled}
-              onCheckedChange={(checked) => updateAlerts({ motion_enabled: checked })}
-            />
+            <Switch checked={alertSettings.motion_enabled} onCheckedChange={(checked) => updateAlerts({ motion_enabled: checked })} />
           </div>
 
-          {/* Sound Alert */}
-          <div 
-            data-testid="sound-alert-card"
-            className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm"
-          >
+          <div data-testid="sound-alert-card" className="bg-[#fafaf8] border-2 border-[#d4dfc4] rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${alertSettings.sound_enabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                 <Volume2 className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-800">Ljuddetektering</p>
-                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">
-                  {alertSettings.sound_enabled ? 'Aktiv' : 'Inaktiv'}
-                </p>
+                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider">{alertSettings.sound_enabled ? 'Aktiv' : 'Inaktiv'}</p>
               </div>
             </div>
-            <Switch
-              data-testid="sound-alert-toggle"
-              checked={alertSettings.sound_enabled}
-              onCheckedChange={(checked) => updateAlerts({ sound_enabled: checked })}
-            />
+            <Switch checked={alertSettings.sound_enabled} onCheckedChange={(checked) => updateAlerts({ sound_enabled: checked })} />
           </div>
         </div>
 
-        {/* Bottom Spacing */}
         <div className="h-8" />
       </div>
     </div>
